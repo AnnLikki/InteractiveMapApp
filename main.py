@@ -264,10 +264,10 @@ class MainWindow(QMainWindow):
                 # print(item_dict)
                 data.append(item_dict)
 
-            # Save the item data to a file
-            with open(filename, 'wb') as file:
-                pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
-                print("Data saved successfully.")
+        # Save the item data to a file
+        with open(filename, 'wb') as file:
+            pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
+            print("Data saved successfully.")
 
     # Load data from a file
     def load_data(self):
