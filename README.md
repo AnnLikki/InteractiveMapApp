@@ -1,6 +1,6 @@
 Interactive Map is a desctop app written in Python (I'm sorry) using QT library. It provideas an ability to import a picture and add customizable markers to it with icons, labels and descriptions.
 
-https://github.com/AnnLikki/InteractiveMapApp/assets/46577377/c5a87fd6-3dc2-4757-b20f-81d6528b712f
+https://github.com/AnnLikki/InteractiveMapApp/assets/46577377/00eeaae4-5846-452e-9ae2-eb553da4f964
 
 
 Points to note:
