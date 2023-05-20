@@ -166,7 +166,7 @@ class MainWindow(QMainWindow):
             marker_pos = self.picture_item.mapFromScene(scene_pos)
 
             # Create the indicator marker using MarkerItem
-            new_marker = MarkerItem(marker_pos, 0)
+            new_marker = MarkerItem(marker_pos, MarkerItem.getTypes()[0], 0)
 
             self.graphics_scene.addItem(new_marker)
 
