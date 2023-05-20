@@ -7,17 +7,18 @@ from PySide6.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem
 
 class MarkerItem(QGraphicsPixmapItem):
 
-    def __init__(self, pos, img_index, name="", showing=False, desc="", color=QColor("black")):
+    def __init__(self, pos, type_index, img_index, name="", showing=False, desc="", color=QColor("black")):
         self.width = 32
         self.height = 32
         self.name = name
         self.desc = desc
         self.showing = showing
+        self.type_index = type_index
         self.img_index = img_index
 
         super().__init__()
 
-        self.setPixmap(self.img_index)
+        self.setImageByType(self.type_index, self.img_index)
         self.pos = pos
         self.setPos(self.pos)
 
@@ -38,9 +39,21 @@ class MarkerItem(QGraphicsPixmapItem):
     def boundingRect(self):
         return QRectF(-self.width / 2, -self.height / 2, self.width, self.height)
 
-    def setPixmap(self, index):
+    @staticmethod
+    def getTypes():
+        return ["Basic", "Adventure", "Creatures and plants", "Landmarks", "People", "Town", "Village", "World map"]
+
+    @staticmethod
+    def getPaths():
+        return ["markers/basic", "markers/adventure", "markers/creatures&plants", "markers/landmarks", "markers/people",
+                "markers/town", "markers/village", "markers/worldmap"]
+
+    def setImageByType(self, type_string, index):
         # Folder path containing the marker images
-        folder_path = "markers"
+        folder_path = MarkerItem.getPaths()[0]
+        if type_string in MarkerItem.getTypes():
+            folder_path = MarkerItem.getPaths()[MarkerItem.getTypes().index(type_string)]
+
         # Get a list of image files in the folder
         image_files = [file for file in os.listdir(folder_path) if file.endswith(".png")]
         image_path = os.path.join(folder_path, image_files[index])
