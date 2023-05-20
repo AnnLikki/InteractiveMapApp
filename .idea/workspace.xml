@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="00197d42-634a-4c53-9a28-8a25643bfb45" name="Changes" comment="Update markers.py">
+    <list default="true" id="00197d42-634a-4c53-9a28-8a25643bfb45" name="Changes" comment="UPDATE Marker Slider">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/markerPanel.py" beforeDir="false" afterPath="$PROJECT_DIR$/markerPanel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/markers.py" beforeDir="false" afterPath="$PROJECT_DIR$/markers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,11 +47,19 @@
       <option name="project" value="LOCAL" />
       <updated>1684610737513</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="UPDATE Marker Slider">
+      <created>1684614584308</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1684614584309</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Update markers.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update markers.py" />
+    <MESSAGE value="UPDATE Marker Slider" />
+    <option name="LAST_COMMIT_MESSAGE" value="UPDATE Marker Slider" />
   </component>
 </project>

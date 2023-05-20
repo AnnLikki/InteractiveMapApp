@@ -268,6 +268,7 @@ class MainWindow(QMainWindow):
                 item_dict = {
                     'type': 'Marker',
                     'pos': item.pos,
+                    'typeInd': item.type_index,
                     'imgInd': item.img_index,
                     'name': item.name,
                     'desc': item.desc,
@@ -310,10 +311,10 @@ class MainWindow(QMainWindow):
             for item_dict in reversed(data):
                 if item_dict['type'] == 'Marker':
                     # Create the MarkerItem with the saved data
-                    marker = MarkerItem(item_dict['pos'], item_dict['imgInd'], item_dict['name'], item_dict['showing'],
-                                        item_dict['desc'], QColor(item_dict['color']))
+                    marker = MarkerItem(item_dict['pos'], item_dict['typeInd'], item_dict['imgInd'], item_dict['name'],
+                                        item_dict['showing'], item_dict['desc'], QColor(item_dict['color']))
                     # print(marker)
-
+                    marker.updateSlider(self.slider.value())
                     self.graphics_scene.addItem(marker)
                 elif item_dict['type'] == 'Image':
                     # print("img")
