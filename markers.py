@@ -72,7 +72,7 @@ class MarkerItem(QGraphicsPixmapItem):
     def updateNamePosition(self):
         # Position the name item underneath the marker item
         name_x = -self.name_item.boundingRect().width() / 2
-        name_y = self.height / 2 + 2  # Adjust the vertical position as desired
+        name_y = self.height / 2  # Adjust the vertical position as desired
         self.name_item.setPos(name_x, name_y)
 
     def showName(self):
