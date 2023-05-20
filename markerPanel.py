@@ -91,15 +91,15 @@ class MarkerPanel(QWidget):
             def handleMarkerImageSelection(type_string, ind):
                 self.marker.setImageByType(type_string, ind)  # Set the pixmap on the marker
 
-            for index, pixmap in enumerate(marker_images):
+            for i, pixmap in enumerate(marker_images):
                 image_button = QPushButton()
                 image_button.setCheckable(True)
                 image_button.setIcon(QIcon(pixmap))
-                image_button.clicked.connect(partial(handleMarkerImageSelection, type_chooser.currentText(), index))
+                image_button.clicked.connect(partial(handleMarkerImageSelection, type_chooser.currentText(), i))
                 image_button.setAutoExclusive(True)  # Set button as exclusively check-able
                 image_button.adjustSize()
                 image_button.setFixedHeight(image_button.width())
-                marker_image_grid.addWidget(image_button, index // 5, index % 5)
+                marker_image_grid.addWidget(image_button, i // 5, i % 5)
 
         update_type()
 
