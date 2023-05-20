@@ -3,7 +3,10 @@ from functools import partial
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QPixmap, QColor
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QGridLayout, QCheckBox, QPushButton, QTextEdit
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QGridLayout, QCheckBox, QPushButton, QTextEdit, \
+    QComboBox, QScrollArea
+
+from markers import MarkerItem
 
 
 class MarkerPanel(QWidget):
@@ -42,43 +45,74 @@ class MarkerPanel(QWidget):
         marker_layout.addWidget(description_field)
 
         # Marker-specific options
+
         self.marker_option = QWidget()
         marker_options_layout = QGridLayout()
         marker_options_layout.setAlignment(Qt.AlignTop)
 
         # Marker image options
-        label_marker_image = QLabel("Marker Image")
+        label_marker_image = QLabel("Marker Icon")
 
-        # Folder path containing the marker images
-        folder_path = "markers"
-        # Get a list of image files in the folder
-        image_files = [file for file in os.listdir(folder_path) if file.endswith(".png")]
-        # Create QPixmap objects for each image file
-        marker_images = []
-        for file in image_files:
-            image_path = os.path.join(folder_path, file)
-            pixmap = QPixmap(image_path)
-            marker_images.append(pixmap)
+        type_chooser = QComboBox()
+        type_chooser.addItems(MarkerItem.getTypes())
 
-        # Function of changing marker's pixmap
-        def handleMarkerImageSelection(ind):
-            self.marker.setPixmap(ind)  # Set the pixmap on the marker
+        self.folder_path = MarkerItem.getPaths()[MarkerItem.getTypes().index(type_chooser.currentText())]
 
+        marker_image_scroll = QScrollArea()
+        marker_image_widget = QWidget()
         marker_image_grid = QGridLayout()
-        for index, pixmap in enumerate(marker_images):
-            image_button = QPushButton()
-            image_button.setCheckable(True)
-            image_button.setIcon(QIcon(pixmap))
-            image_button.clicked.connect(partial(handleMarkerImageSelection, index))
-            image_button.setAutoExclusive(True)  # Set button as exclusively check-able
-            marker_image_grid.addWidget(image_button, index // 5, index % 5)
+        marker_image_widget.setLayout(marker_image_grid)
+        marker_image_scroll.setWidgetResizable(True)
+        marker_image_scroll.setWidget(marker_image_widget)
+        marker_image_widget.setFixedWidth(160)
+        marker_image_grid.setContentsMargins(0, 0, 0, 0)
+        marker_image_grid.setSpacing(2)
+        marker_image_grid.setAlignment(Qt.AlignTop)
+
+        def update_type():
+
+            while marker_image_grid.count():
+                widget = marker_image_grid.takeAt(0).widget()
+                if widget is not None:
+                    widget.deleteLater()
+
+            self.folder_path = MarkerItem.getPaths()[MarkerItem.getTypes().index(type_chooser.currentText())]
+
+            # Get a list of image files in the folder
+            image_files = [file for file in os.listdir(self.folder_path) if file.endswith(".png")]
+            # Create QPixmap objects for each image file
+            marker_images = []
+            for file in image_files:
+                image_path = os.path.join(self.folder_path, file)
+                pixmap = QPixmap(image_path)
+                marker_images.append(pixmap)
+
+            # Function of changing marker's pixmap
+            def handleMarkerImageSelection(type_string, ind):
+                self.marker.setImageByType(type_string, ind)  # Set the pixmap on the marker
+
+            for index, pixmap in enumerate(marker_images):
+                image_button = QPushButton()
+                image_button.setCheckable(True)
+                image_button.setIcon(QIcon(pixmap))
+                image_button.clicked.connect(partial(handleMarkerImageSelection, type_chooser.currentText(), index))
+                image_button.setAutoExclusive(True)  # Set button as exclusively check-able
+                image_button.adjustSize()
+                image_button.setFixedHeight(image_button.width())
+                marker_image_grid.addWidget(image_button, index // 5, index % 5)
+
+        update_type()
+
+        type_chooser.currentTextChanged.connect(update_type)
+
         marker_options_layout.addWidget(label_marker_image, 0, 0)
-        marker_options_layout.addLayout(marker_image_grid, 1, 0)
+        marker_options_layout.addWidget(type_chooser, 1, 0)
+        marker_options_layout.addWidget(marker_image_scroll, 2, 0)
 
         # Show marker name checkbox
         show_name_checkbox = QCheckBox("Show marker name")
         show_name_checkbox.setChecked(self.marker.showing)
-        marker_options_layout.addWidget(show_name_checkbox, 2, 0)
+        marker_options_layout.addWidget(show_name_checkbox, 3, 0)
 
         def handleShowNameState(state):
             if state:
