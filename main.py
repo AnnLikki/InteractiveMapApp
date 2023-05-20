@@ -6,7 +6,7 @@ import sys
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QPixmap, QColor
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
-    QToolBar, QGraphicsView, QGraphicsScene, QFileDialog, QTextEdit, QGraphicsPixmapItem
+    QToolBar, QGraphicsView, QGraphicsScene, QFileDialog, QTextEdit, QGraphicsPixmapItem, QSlider
 
 from markerPanel import MarkerPanel
 from markers import MarkerItem
@@ -55,6 +55,7 @@ class MainWindow(QMainWindow):
         self.graphics_view = QGraphicsView(self.graphics_scene)
         self.graphics_view.setRenderHint(QPainter.Antialiasing)
         # TODO Figure out the warning
+        # noinspection PyUnresolvedReferences
         self.graphics_view.setDragMode(QGraphicsView.ScrollHandDrag)
         self.graphics_view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.graphics_view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -88,7 +89,19 @@ class MainWindow(QMainWindow):
         button_reset.clicked.connect(self.reset_image)
         toolbar.addWidget(button_reset)
 
-        # TODO Create slider
+        # Create a slider
+        slider_label = QLabel("Marker Size")
+        slider_label.setContentsMargins(20, 0, 10, 0)
+        toolbar.addWidget(slider_label)
+
+        self.slider = QSlider()
+        self.slider.setOrientation(Qt.Horizontal)
+        self.slider.setMaximumWidth(200)
+        self.slider.setMinimum(10)
+        self.slider.setMaximum(100)
+        self.slider.setValue(25)
+        self.slider.valueChanged.connect(self.set_marker_size)
+        toolbar.addWidget(self.slider)
 
         # Fill the main colors_layout
         main_layout.addWidget(left_panel)
@@ -167,6 +180,7 @@ class MainWindow(QMainWindow):
 
             # Create the indicator marker using MarkerItem
             new_marker = MarkerItem(marker_pos, MarkerItem.getTypes()[0], 0)
+            new_marker.updateSlider(self.slider.value())
 
             self.graphics_scene.addItem(new_marker)
 
@@ -230,6 +244,13 @@ class MainWindow(QMainWindow):
         if len(selected_items) == 1 and isinstance(selected_items[0], MarkerItem):
             marker = selected_items[0]
             self.show_existing_marker(marker)
+
+    def set_marker_size(self):
+        if self.picture_item is not None:
+            items = self.graphics_scene.items()
+            for marker in items:
+                if isinstance(marker, MarkerItem):
+                    marker.updateSlider(self.slider.value())
 
     # Save data to a file
     def save_file(self, filename):
