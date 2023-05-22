@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="00197d42-634a-4c53-9a28-8a25643bfb45" name="Changes" comment="Saving error regarding types fixed">
+    <list default="true" id="00197d42-634a-4c53-9a28-8a25643bfb45" name="Changes" comment="1.2.0.1 Release version&#10;Distributable available">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
