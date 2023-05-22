@@ -1,7 +1,7 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 2, 0, 2), #<- Put File version here
+    filevers=(1, 2, 0, 3), #<- Put File version here
     mask=0x3f, 
     flags=0x0,
     OS=0x4,
@@ -16,7 +16,7 @@ VSVersionInfo(
         u'040904b0',
         [StringStruct(u'CompanyName', u'Green Cat Studio'),
         StringStruct(u'ProductName', u'Interactive Map App'),
-        StringStruct(u'ProductVersion', u'1.2.0.2'),
+        StringStruct(u'ProductVersion', u'1.2.0.3'),
         StringStruct(u'OriginalFilename', u'InteractiveMap.exe'),
         StringStruct(u'FileDescription', u'An app for creating interactive maps via pictures and markers.'),
         StringStruct(u'LegalCopyright', u'Owned by Green Cat Studio'),

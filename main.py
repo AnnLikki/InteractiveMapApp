@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
 
     def place_new_marker(self, event):
         # Check if a picture has been loaded
-        if self.picture_item is not None and not self.marker_editing_flag:
+        if self.picture_item is not None and (not self.marker_editing_flag or self.left_layout.isEmpty()):
 
             while self.left_layout.count():
                 widget = self.left_layout.takeAt(0).widget()
@@ -266,7 +266,7 @@ class MainWindow(QMainWindow):
                 item_dict = {
                     'type': 'Marker',
                     'pos': item.pos,
-                    'typeInd': item.type_index,
+                    'typeInd': item.type_string,
                     'imgInd': item.img_index,
                     'name': item.name,
                     'desc': item.desc,
@@ -287,7 +287,7 @@ class MainWindow(QMainWindow):
         # Save the item data to a file
         with open(filename, 'wb') as file:
             pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
-            print("Data saved successfully.")
+            # print("Data saved successfully.")
 
     # Load data from a file
     def load_data(self):

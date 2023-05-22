@@ -8,12 +8,12 @@ from PySide6.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem
 class MarkerItem(QGraphicsPixmapItem):
     max_size = 128
 
-    def __init__(self, pos, type_index, img_index, name="", showing=False, desc="", color=QColor("black")):
+    def __init__(self, pos, type_string, img_index, name="", showing=False, desc="", color=QColor("black")):
         self.size = 32
         self.name = name
         self.desc = desc
         self.showing = showing
-        self.type_index = type_index
+        self.type_string = type_string
         self.img_index = img_index
 
         super().__init__()
@@ -27,7 +27,7 @@ class MarkerItem(QGraphicsPixmapItem):
 
         self.slider = 25
         self.pixmap = None
-        self.setImageByType(self.type_index, self.img_index)
+        self.setImageByType(self.type_string, self.img_index)
         self.pos = pos
         self.setPos(self.pos)
 
@@ -53,8 +53,10 @@ class MarkerItem(QGraphicsPixmapItem):
 
         # Get a list of image files in the folder
         image_files = [file for file in os.listdir(folder_path) if file.endswith(".png")]
+        # print(type_string, index, folder_path)
         image_path = os.path.join(folder_path, image_files[index])
         pixmap = QPixmap(image_path)
+        self.type_string = type_string
         self.pixmap = pixmap
         self.updateSlider(self.slider)
         self.img_index = index
