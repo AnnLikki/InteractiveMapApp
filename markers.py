@@ -5,67 +5,73 @@ from PySide6.QtGui import QFont, QPixmap, QColor
 from PySide6.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem
 
 
+def getImagePathsByCategory(category):  # TODO Test this function with exceptions
+    if category in MarkerItem.PathsByCategory.keys():
+        folder_path = MarkerItem.PathsByCategory[category]
+    else:
+        folder_path = list(MarkerItem.PathsByCategory.keys())[0]
+        raise ValueError("No such category of markers:", category, "is not in MarkerItem.PathsByCategory:",
+                         MarkerItem.PathsByCategory.keys())
+
+    # Get a list of image files in the folder
+    return [file for file in os.listdir(folder_path) if file.endswith(".png")]
+
+
 class MarkerItem(QGraphicsPixmapItem):
     max_size = 128
+    PathsByCategory = {"Basic": "markers/basic", "Adventure": "markers/adventure",
+                       "Creatures and plants": "markers/creatures&plants", "Landmarks": "markers/landmarks",
+                       "People": "markers/people", "Town": "markers/town", "Village": "markers/village",
+                       "World map": "markers/worldmap"}
 
-    def __init__(self, pos, type_string, img_index, name="", showing=False, desc="", color=QColor("black")):
-        self.size = 32
+    def __init__(self, pos, category=list(PathsByCategory.keys())[0], image_index=0, name="", showing=False, desc="",
+                 color=QColor("black")):
+        # Copying data
+        self.pos = pos
+        self.category = category
+        self.image_index = image_index
         self.name = name
-        self.desc = desc
         self.showing = showing
-        self.type_string = type_string
-        self.img_index = img_index
+        self.desc = desc
+        self.color = color
 
         super().__init__()
+
+        # Additional data
+        self.size = 32
+        self.slider = 25
+        self.pixmap = None
+
+        self.setPos(self.pos)
+        self.setImageByType(self.category, self.image_index)
+
+        # Creating a child QGraphicsTextItem as a marker label
+        self.name_textItem = QGraphicsTextItem(self)
+        self.name_textItem.setPlainText(self.name)
+        self.name_textItem.setFont(QFont("Arial", 10))
+        self.setTextColor(self.color)
+
+        self.setShowing(self.showing)
 
         self.setFlag(QGraphicsPixmapItem.ItemIgnoresTransformations)
         self.setFlag(QGraphicsPixmapItem.ItemIsSelectable)
 
-        self.name_item = QGraphicsTextItem(self)
-        self.name_item.setPlainText(self.name)
-        self.setFormat(color)
-
-        self.slider = 25
-        self.pixmap = None
-        self.setImageByType(self.type_string, self.img_index)
-        self.pos = pos
-        self.setPos(self.pos)
-
-        self.updateShowing()
-
     def boundingRect(self):
         return QRectF(-self.size / 2, -self.size / 2, self.size, self.size)
 
-    @staticmethod
-    def getTypes():
-        return ["Basic", "Adventure", "Creatures and plants", "Landmarks", "People", "Town", "Village", "World map"]
-
-    @staticmethod
-    def getPaths():
-        return ["markers/basic", "markers/adventure", "markers/creatures&plants", "markers/landmarks", "markers/people",
-                "markers/town", "markers/village", "markers/worldmap"]
-
-    def setImageByType(self, type_string, index):
-        # Folder path containing the marker images
-        folder_path = MarkerItem.getPaths()[0]
-        if type_string in MarkerItem.getTypes():
-            folder_path = MarkerItem.getPaths()[MarkerItem.getTypes().index(type_string)]
-
-        # Get a list of image files in the folder
-        image_files = [file for file in os.listdir(folder_path) if file.endswith(".png")]
-        # print(type_string, index, folder_path)
-        image_path = os.path.join(folder_path, image_files[index])
+    def setImageByType(self, category, index):
+        image_path = os.path.join(MarkerItem.PathsByCategory[category], getImagePathsByCategory(category)[index])
         pixmap = QPixmap(image_path)
-        self.type_string = type_string
+        self.category = category
         self.pixmap = pixmap
-        self.updateSlider(self.slider)
-        self.img_index = index
+        self.image_index = index
+        self.updatePixmap()
 
-    def updateSlider(self, slider):
+    def setSlider(self, slider):
         self.slider = slider
         self.size = MarkerItem.max_size * self.slider // 100
-        self.updatePixmap()
         self.setOffset(-self.size / 2, -self.size / 2)
+        self.updatePixmap()
         self.updateNamePosition()
 
     def updatePixmap(self):
@@ -73,41 +79,22 @@ class MarkerItem(QGraphicsPixmapItem):
 
     def setName(self, text):
         self.name = text
-        self.name_item.setPlainText(self.name)
+        self.name_textItem.setPlainText(self.name)
         self.updateNamePosition()
-
-    def setDesc(self, text):
-        self.desc = text
 
     def updateNamePosition(self):
         # Position the name item underneath the marker item
-        name_x = -self.name_item.boundingRect().width() / 2
-        name_y = self.size / 2  # Adjust the vertical position as desired
-        self.name_item.setPos(name_x, name_y)
+        name_x = -self.name_textItem.boundingRect().width() / 2
+        name_y = self.size / 2
+        self.name_textItem.setPos(name_x, name_y)
 
-    def showName(self):
-        self.showing = True
-        self.name_item.setVisible(True)
+    def setShowing(self, showing):
+        self.showing = showing
+        self.name_textItem.setVisible(showing)
 
-    def hideName(self):
-        self.showing = False
-        self.name_item.setVisible(False)
-
-    def updateShowing(self):
-        if self.showing:
-            self.showName()
-        else:
-            self.hideName()
-
-    def isNameHidden(self):
-        return self.name_item.isVisible()
-
-    def setFormat(self, color=QColor("black")):
-        self.name_item.setFont(QFont("Arial", 10))
-        self.name_item.setDefaultTextColor(color)
-
-    def getColor(self):
-        return self.name_item.defaultTextColor()
+    def setTextColor(self, color):
+        self.color = color
+        self.name_textItem.setDefaultTextColor(self.color)
 
     def setMovable(self, movable):
         if movable:
