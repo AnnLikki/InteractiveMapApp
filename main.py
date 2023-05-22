@@ -4,7 +4,7 @@ import pickle
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPainter, QPixmap, QColor
+from PySide6.QtGui import QPainter, QPixmap, QColor, QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
     QToolBar, QGraphicsView, QGraphicsScene, QFileDialog, QTextEdit, QGraphicsPixmapItem, QSlider
 
@@ -17,6 +17,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Interactive Map")
+        self.setWindowIcon(QIcon("./icon.ico"))
         self.picture_item = None
         self.resize(800, 600)
 
