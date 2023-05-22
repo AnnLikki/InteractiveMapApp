@@ -4,7 +4,7 @@ import pickle
 import sys
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPainter, QPixmap, QColor
+from PySide6.QtGui import QPainter, QPixmap, QColor, QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
     QToolBar, QGraphicsView, QGraphicsScene, QFileDialog, QTextEdit, QGraphicsPixmapItem, QSlider
 
@@ -17,6 +17,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Interactive Map")
+        self.setWindowIcon(QIcon("./icon.ico"))
         self.picture_item = None
         self.resize(800, 600)
 
@@ -32,11 +33,7 @@ class MainWindow(QMainWindow):
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         left_panel.setLayout(self.left_layout)
 
-        # Create the marker panel widget
-        marker_panel = QWidget()
-        marker_panel.setMaximumWidth(220)
-        self.marker_layout = QVBoxLayout()
-        marker_panel.setLayout(self.marker_layout)
+        self.marker_editing_flag = False
 
         # Create the center panel widget
         center_panel = QWidget()
@@ -106,7 +103,6 @@ class MainWindow(QMainWindow):
 
         # Fill the main colors_layout
         main_layout.addWidget(left_panel)
-        main_layout.addWidget(marker_panel)
         main_layout.addWidget(center_panel)
 
         # Create and set the central widget
@@ -168,7 +164,12 @@ class MainWindow(QMainWindow):
 
     def place_new_marker(self, event):
         # Check if a picture has been loaded
-        if self.picture_item is not None and self.marker_layout.isEmpty():
+        if self.picture_item is not None and (not self.marker_editing_flag or self.left_layout.isEmpty()):
+
+            while self.left_layout.count():
+                widget = self.left_layout.takeAt(0).widget()
+                if widget is not None:
+                    widget.deleteLater()
 
             # Get the cursor position in relation to the graphics view
             cursor_pos = event.position().toPoint()
@@ -185,26 +186,22 @@ class MainWindow(QMainWindow):
 
             self.graphics_scene.addItem(new_marker)
 
-            self.marker_layout.addWidget(MarkerPanel(new_marker, self.graphics_scene))
-
-            # Hide the left panel
-            while self.left_layout.count():
-                widget = self.left_layout.takeAt(0).widget()
-                if widget is not None:
-                    widget.deleteLater()
+            self.left_layout.addWidget(MarkerPanel(new_marker, self.graphics_scene))
+            self.marker_editing_flag = True
 
     def show_existing_marker(self, marker):
-        if self.picture_item is not None and self.marker_layout.isEmpty():
+
+        if self.picture_item is not None and (not self.marker_editing_flag or self.left_layout.isEmpty()):
+            self.marker_editing_flag = False
 
             while self.left_layout.count():
                 widget = self.left_layout.takeAt(0).widget()
                 if widget is not None:
                     widget.deleteLater()
 
-            left_panel = QWidget()
+            marker_info_panel = QWidget()
             layout = QVBoxLayout()
             layout.setAlignment(Qt.AlignTop)
-            left_panel.setMaximumWidth(220)
 
             # Label for marker name
             name_label = QLabel(marker.name)
@@ -219,8 +216,8 @@ class MainWindow(QMainWindow):
             edit_button = QPushButton("Edit")
 
             def handleEditButton():
-                self.marker_layout.addWidget(MarkerPanel(marker, self.graphics_scene))
-                left_panel.deleteLater()
+                marker_info_panel.deleteLater()
+                self.left_layout.addWidget(MarkerPanel(marker, self.graphics_scene))
 
             edit_button.clicked.connect(handleEditButton)
             layout.addWidget(edit_button)
@@ -229,22 +226,22 @@ class MainWindow(QMainWindow):
             close_button = QPushButton("Close")
 
             def handleCloseButton():
-                left_panel.deleteLater()
+                marker_info_panel.deleteLater()
                 self.graphics_scene.clearSelection()
 
             close_button.clicked.connect(handleCloseButton)
             layout.addWidget(close_button)
 
-            layout.setContentsMargins(0, 0, 0, 0)
-            left_panel.setLayout(layout)
+            marker_info_panel.setLayout(layout)
 
-            self.left_layout.addWidget(left_panel)
+            self.left_layout.addWidget(marker_info_panel)
 
     def handleMarkerSelectionChanged(self):
-        selected_items = self.graphics_scene.selectedItems()
-        if len(selected_items) == 1 and isinstance(selected_items[0], MarkerItem):
-            marker = selected_items[0]
-            self.show_existing_marker(marker)
+        if len(self.graphics_scene.items()) > 0:
+            selected_items = self.graphics_scene.selectedItems()
+            if len(selected_items) == 1 and isinstance(selected_items[0], MarkerItem):
+                marker = selected_items[0]
+                self.show_existing_marker(marker)
 
     def set_marker_size(self):
         if self.picture_item is not None:
@@ -269,7 +266,7 @@ class MainWindow(QMainWindow):
                 item_dict = {
                     'type': 'Marker',
                     'pos': item.pos,
-                    'typeInd': item.type_index,
+                    'typeInd': item.type_string,
                     'imgInd': item.img_index,
                     'name': item.name,
                     'desc': item.desc,
@@ -290,7 +287,7 @@ class MainWindow(QMainWindow):
         # Save the item data to a file
         with open(filename, 'wb') as file:
             pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
-            print("Data saved successfully.")
+            # print("Data saved successfully.")
 
     # Load data from a file
     def load_data(self):
