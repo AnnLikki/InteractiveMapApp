@@ -176,6 +176,7 @@ class MarkerPanel(QWidget):
 
         def handleSaveButton():
             self.marker.desc = description_field.toPlainText()
+            self.marker.pos = self.marker.scenePos()
             self.scene.clearSelection()
             self.deleteLater()
 
