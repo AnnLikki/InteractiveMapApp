@@ -181,8 +181,8 @@ class MainWindow(QMainWindow):
             marker_pos = self.picture_item.mapFromScene(scene_pos)
 
             # Create the indicator marker using MarkerItem
-            new_marker = MarkerItem(marker_pos, MarkerItem.getTypes()[0], 0)
-            new_marker.updateSlider(self.slider.value())
+            new_marker = MarkerItem(marker_pos)
+            new_marker.setSlider(self.slider.value())
 
             self.graphics_scene.addItem(new_marker)
 
@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
             items = self.graphics_scene.items()
             for marker in items:
                 if isinstance(marker, MarkerItem):
-                    marker.updateSlider(self.slider.value())
+                    marker.setSlider(self.slider.value())
 
     # Save data to a file
     def save_file(self, filename):
@@ -266,12 +266,12 @@ class MainWindow(QMainWindow):
                 item_dict = {
                     'type': 'Marker',
                     'pos': item.pos,
-                    'typeInd': item.type_string,
-                    'imgInd': item.img_index,
+                    'typeInd': item.category,
+                    'imgInd': item.image_index,
                     'name': item.name,
                     'desc': item.desc,
                     'showing': item.showing,
-                    'color': item.getColor()
+                    'color': item.color
                 }
                 # print(item_dict)
                 data.append(item_dict)
@@ -312,13 +312,13 @@ class MainWindow(QMainWindow):
                     marker = MarkerItem(item_dict['pos'], item_dict['typeInd'], item_dict['imgInd'], item_dict['name'],
                                         item_dict['showing'], item_dict['desc'], QColor(item_dict['color']))
                     # print(marker)
-                    marker.updateSlider(self.slider.value())
+                    marker.setSlider(self.slider.value())
                     self.graphics_scene.addItem(marker)
                 elif item_dict['type'] == 'Image':
                     # print("img")
                     self.new_map(item_dict['imgPath'])
 
-            print("Data loaded successfully.")
+            # print("Data loaded successfully.")
 
 
 if __name__ == "__main__":

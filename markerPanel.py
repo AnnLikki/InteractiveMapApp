@@ -6,6 +6,7 @@ from PySide6.QtGui import QIcon, QPixmap, QColor
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QGridLayout, QCheckBox, QPushButton, QTextEdit, \
     QComboBox, QScrollArea
 
+import markers
 from markers import MarkerItem
 
 
@@ -63,9 +64,9 @@ class MarkerPanel(QWidget):
         label_marker_image = QLabel("Marker Icon")
 
         type_chooser = QComboBox()
-        type_chooser.addItems(MarkerItem.getTypes())
+        type_chooser.addItems(list(MarkerItem.PathsByCategory.keys()))
 
-        self.folder_path = MarkerItem.getPaths()[MarkerItem.getTypes().index(type_chooser.currentText())]
+        self.folder_path = MarkerItem.PathsByCategory[type_chooser.currentText()]
 
         marker_image_scroll = QScrollArea()
         marker_image_widget = QWidget()
@@ -77,17 +78,17 @@ class MarkerPanel(QWidget):
         marker_image_grid.setSpacing(2)
         marker_image_grid.setAlignment(Qt.AlignTop)
 
-        def update_type():
+        def update_category():
 
             while marker_image_grid.count():
                 widget = marker_image_grid.takeAt(0).widget()
                 if widget is not None:
                     widget.deleteLater()
 
-            self.folder_path = MarkerItem.getPaths()[MarkerItem.getTypes().index(type_chooser.currentText())]
+            self.folder_path = MarkerItem.PathsByCategory[type_chooser.currentText()]
 
             # Get a list of image files in the folder
-            image_files = [file for file in os.listdir(self.folder_path) if file.endswith(".png")]
+            image_files = markers.getImagePathsByCategory(type_chooser.currentText())
             # Create QPixmap objects for each image file
             marker_images = []
             for file in image_files:
@@ -97,7 +98,7 @@ class MarkerPanel(QWidget):
 
             # Function of changing marker's pixmap
             def handleMarkerImageSelection(type_string, ind):
-                self.marker.setImageByType(type_string, ind)  # Set the pixmap on the marker
+                self.marker.setImageByType(type_string, ind)
 
             for i, pixmap in enumerate(marker_images):
                 image_button = QPushButton()
@@ -109,9 +110,9 @@ class MarkerPanel(QWidget):
                 image_button.setFixedHeight(image_button.width())
                 marker_image_grid.addWidget(image_button, i // 5, i % 5)
 
-        update_type()
+        update_category()
 
-        type_chooser.currentTextChanged.connect(update_type)
+        type_chooser.currentTextChanged.connect(update_category)
 
         layout.addWidget(label_marker_image, 5, 0, 1, 2)
         layout.addWidget(type_chooser, 6, 0, 1, 2)
@@ -123,10 +124,7 @@ class MarkerPanel(QWidget):
         layout.addWidget(show_name_checkbox, 8, 0, 1, 2)
 
         def handleShowNameState(state):
-            if state:
-                self.marker.showName()
-            else:
-                self.marker.hideName()
+            self.marker.setShowing(state)
 
         show_name_checkbox.stateChanged.connect(handleShowNameState)
 
@@ -139,12 +137,12 @@ class MarkerPanel(QWidget):
 
         self.selected_color = QColor("black")
 
-        colors = [QColor("black"), QColor("red"), QColor("blue"), QColor("green"), QColor("yellow"),
-                  QColor("white"), QColor("orange"), QColor("pink"), QColor("purple"), QColor("lightGreen")]
+        colors = [QColor("black"), QColor("red"), QColor("blue"), QColor("green"), QColor("purple"),
+                  QColor("white"), QColor("orange"), QColor("pink"), QColor("yellow"), QColor("lightGreen")]
 
         def handleColorSelection(ind):
             self.selected_color = self.color_buttons[ind].palette().button().color()
-            self.marker.setFormat(self.selected_color)
+            self.marker.setTextColor(self.selected_color)
 
         for index, color in enumerate(colors):
             button = QPushButton()
